@@ -26,6 +26,7 @@ Configure using the new config flow!
 ## Code Credits
 
 - https://github.com/whitingj/mca66
+- https://github.com/qguernsey/Lync12
 - https://github.com/steve28/mca66
 - http://www.brandonclaps.com/?p=173
 - https://github.com/lounsbrough/htd-mca-66-api
