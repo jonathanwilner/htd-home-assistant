@@ -10,7 +10,7 @@ from homeassistant.core import callback, HomeAssistant
 from htd_client import get_model_info, HtdDeviceKind
 from htd_client.constants import HtdConstants
 
-from .const import CONF_DEVICE_KIND, CONF_DEVICE_NAME, CONF_RETRY_ATTEMPTS, CONF_SOCKET_TIMEOUT, DOMAIN
+from .const import CONF_DEVICE_KIND, CONF_DEVICE_NAME, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
 
         _LOGGER.info("Model identified as: %s" % model_info)
 
-        unique_id = "htd-%s-%s" % (discovery_info.macaddress, model_info["name"])
+        unique_id = "htd-%s-%s" % (discovery_info.macaddress, model_info["kind"])
 
         await self.async_set_unique_id(unique_id)
 
@@ -116,8 +116,6 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
         return HtdOptionsFlowHandler(config_entry)
 
     async def async_step_options(self, user_input=None):
-        model_info = get_model_info(self.host, self.port)
-
         if user_input is not None:
             config_entry = {
                 CONF_DEVICE_KIND: self.kind,
@@ -135,6 +133,8 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
                 data=config_entry,
                 options=options
             )
+
+        model_info = get_model_info(self.host, self.port)
 
         return self.async_show_form(
             step_id='options',
