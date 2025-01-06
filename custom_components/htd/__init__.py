@@ -1,4 +1,4 @@
-"""Support for Home Theatre Direct's MC series"""
+"""Support for Home Theater Direct products"""
 
 from __future__ import annotations, annotations
 
@@ -28,7 +28,6 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     port = config_entry.data.get(CONF_PORT)
 
     config_entry.runtime_data = get_client(kind, host, port)
-    config_entry.runtime_data.wait_until_ready()
 
     config_entry.async_on_unload(
         config_entry.add_update_listener(update_listener)

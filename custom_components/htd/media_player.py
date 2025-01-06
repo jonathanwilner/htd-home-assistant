@@ -15,7 +15,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
 )
 from homeassistant.core import HomeAssistant
-from htd_client import BaseClient, HtdConstants, HtdDeviceKind, HtdMcaClient
+from htd_client import BaseClient, HtdConstants, HtdMcaClient
 from htd_client.models import ZoneDetail
 
 MEDIA_PLAYER_PREFIX = "media_player.htd_"
@@ -172,11 +172,14 @@ class HtdDevice(MediaPlayerEntity):
         self.client.unsubscribe(self._do_update)
 
     def _do_update(self, zone: int):
-        if zone is not None and zone != self.zone and self.zone_info is not None:
+        if zone is None and self.zone_info is not None:
+            return
+
+        if zone is not None and zone != self.zone:
             return
 
         # if there's a target volume for mca, don't update yet
-        if isinstance(self.client, HtdMcaClient) and self.client._target_volumes.get(self.zone) is not None:
+        if isinstance(self.client, HtdMcaClient) and self.client.has_volume_target(self.zone):
             return
 
         self.zone_info = self.client.get_zone(self.zone)
