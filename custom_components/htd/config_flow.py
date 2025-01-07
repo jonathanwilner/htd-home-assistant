@@ -124,14 +124,10 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_UNIQUE_ID: self.unique_id,
             }
 
-            options = {
-                **user_input,
-            }
-
             return self.async_create_entry(
                 title=user_input[CONF_DEVICE_NAME],
                 data=config_entry,
-                options=options
+                options={}
             )
 
         model_info = get_model_info(self.host, self.port)
@@ -148,25 +144,23 @@ class HtdOptionsFlowHandler(OptionsFlowWithConfigEntry):
     async def async_step_init(self, user_input: dict[str, Any] | None = None):
         if user_input is not None:
             options = {
-                **self.options, **user_input,
+                **self.config_entry.data,
+                **user_input
             }
 
-            return self.async_create_entry(
-                title=options[CONF_DEVICE_NAME], data=options
+            self.hass.config_entries.async_update_entry(
+                self.config_entry,
+                data=options
             )
 
-        friendly_name = self.config_entry.title
+            return self.async_create_entry(title=self.config_entry.title, data={})
 
         return self.async_show_form(
-            step_id='options',
-            data_schema=get_options_schema(
-                friendly_name=friendly_name,
-            )
+            step_id='init',
+            data_schema=get_connection_settings_schema(self.config_entry)
         )
 
-def get_options_schema(
-    friendly_name: str,
-):
+def get_options_schema(friendly_name: str):
     return vol.Schema(
         {
             vol.Required(

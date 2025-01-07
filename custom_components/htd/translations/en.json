@@ -2,65 +2,41 @@
   "config": {
     "step": {
       "user": {
-        "title": "HTD Device Setup"
+        "title": "Home Theater Direct",
+        "data": {
+          "device_kind": "Type of device",
+          "mca": "MC/MCA66",
+          "lync": "Lync 6/12",
+          "host": "Host name or IP Address",
+          "port": "Port (default is 10006)"
+        }
       },
       "options": {
-        "title": "HTD MC/MCA-66 Setup",
+        "title": "Home Theater Direct",
         "description": "Setup the gateway",
         "data": {
-          "device_name": "Device name",
-          "active_zones": "Number of active zones",
-          "update_volume_on_change": "Show incremental volume updates on change when setting volume"
+          "device_name": "Device name"
         }
       }
     },
     "error": {
       "no_connection": "Could not connect",
       "missing_input": "Please fill in required fields"
-    },
-    "abort": {
-      "no_home": "No home coordinates are set in the Home Assistant configuration"
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Configure Device",
-        "menu_options": {
-          "options": "User Options",
-          "sources": "Source Names",
-          "advanced": "Advanced Options"
+        "data": {
+          "device_kind": "Type of device",
+          "host": "Host name or IP Address",
+          "port": "Port (default is 10006)"
         }
       },
       "options": {
-        "title": "HTD MC/MCA-66 Setup",
-        "description": "Setup the gateway",
-        "data": {
-          "device_name": "Device name",
-          "active_zones": "Number of active zones",
-          "update_volume_on_change": "Show incremental volume updates on change when setting volume"
-        }
-      },
-      "sources": {
-        "title": "Source Names/Aliases",
-        "description": "Set an name/alias for any input source",
-        "data": {
-          "source_1": "Source 1",
-          "source_2": "Source 2",
-          "source_3": "Source 3",
-          "source_4": "Source 4",
-          "source_5": "Source 5",
-          "source_6": "Source 6"
-        }
-      },
-      "advanced": {
-        "title": "Advanced Options",
-        "description": "Please use with caution",
-        "data": {
-          "retry_attempts": "Number of retries to re-attempt if a bad response.",
-          "socket_timeout": "Connection timeout (in milliseconds)",
-          "command_delay": "Delay in between commands (in milliseconds)"
-        }
+        "title": "Home Theater Direct",
+        "description": "Choose a name for this gateway."
       }
     }
   }
