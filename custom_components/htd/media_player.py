@@ -178,6 +178,9 @@ class HtdDevice(MediaPlayerEntity):
         if zone is not None and zone != self.zone:
             return
 
+        if not self.client.has_zone_data(self.zone):
+            return
+
         # if there's a target volume for mca, don't update yet
         if isinstance(self.client, HtdMcaClient) and self.client.has_volume_target(self.zone):
             return

@@ -30,7 +30,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     config_entry.runtime_data = get_client(kind, host, port)
 
     config_entry.async_on_unload(
-        config_entry.add_update_listener(update_listener)
+        config_entry.add_update_listener(async_update_listener)
     )
 
     _async_cleanup_registry_entries(hass, config_entry)
@@ -42,7 +42,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     return True
 
 
-async def update_listener(
+async def async_update_listener(
     hass: HomeAssistant,
     config_entry: ConfigEntry
 ) -> None:
