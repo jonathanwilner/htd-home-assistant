@@ -15,7 +15,7 @@ Easiest installation is via [HACS](https://hacs.xyz/):
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=hikirsch&repository=htd-home-assistant&category=integration)
 
-`HACS -> Integrations -> Explore & Add Repositories -> HTD MC/MCA-66 Series`
+`HACS -> Integrations -> Explore & Add Repositories -> Home Theater Direct`
 
 ### Manually
 
