@@ -11,7 +11,7 @@
   "integration_type": "hub",
   "dependencies": [],
   "requirements": [
-    "htd_client==0.0.8"
+    "htd_client==0.0.9"
   ],
   "config_flow": true,
   "dhcp": [
