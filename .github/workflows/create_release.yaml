@@ -25,7 +25,7 @@ jobs:
           RESPONSE=$(curl -s https://api.github.com/repos/hikirsch/htd-home-assistant/releases)
 
           # Check if the version exists in the published releases
-          if echo "$RESPONSE" | grep -q "\"tag_name\": \"$VERSION\""; then
+          if echo "$RESPONSE" | grep -q "\"tag_name\": \"v$VERSION\""; then
             echo "Version $VERSION has already been published. Failing the build."
             exit 1
           else
