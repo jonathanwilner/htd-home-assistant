@@ -16,6 +16,22 @@ jobs:
         id: manifest-info
         run: echo "::set-output name=version::$(jq -r '.version' custom_components/htd/manifest.json)"
 
+      - name: Check if version is already published
+        run: |
+          VERSION="${{ steps.manifest-info.outputs.version }}"
+          echo "Version to check: $VERSION"
+
+          # Query the releases from GitHub API (or another registry if necessary)
+          RESPONSE=$(curl -s https://api.github.com/repos/home-assistant/core/releases)
+
+          # Check if the version exists in the published releases
+          if echo "$RESPONSE" | grep -q "\"tag_name\": \"$VERSION\""; then
+            echo "Version $VERSION has already been published. Failing the build."
+            exit 1
+          else
+            echo "Version $VERSION is not published. Proceeding."
+          fi
+
       - name: Package
         run: cd custom_components/htd && zip -r ../../htd.zip * && cd ../..
 

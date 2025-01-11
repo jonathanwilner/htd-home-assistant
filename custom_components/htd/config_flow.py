@@ -3,11 +3,11 @@ from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components import dhcp, usb
+from homeassistant.components import dhcp
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow, OptionsFlowWithConfigEntry
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT, CONF_UNIQUE_ID
 from homeassistant.core import callback, HomeAssistant
-from htd_client import get_model_info, HtdDeviceKind
+from htd_client import get_model_info
 from htd_client.constants import HtdConstants
 
 from .const import CONF_DEVICE_NAME, DOMAIN
@@ -26,7 +26,6 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
     MINOR_VERSION = 1
 
-    kind: HtdDeviceKind = None
     host: str = None
     port: int = HtdConstants.DEFAULT_PORT
     unique_id: str = None
