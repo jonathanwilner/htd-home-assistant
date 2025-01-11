@@ -22,7 +22,7 @@ jobs:
           echo "Version to check: $VERSION"
 
           # Query the releases from GitHub API (or another registry if necessary)
-          RESPONSE=$(curl -s https://api.github.com/repos/home-assistant/core/releases)
+          RESPONSE=$(curl -s https://api.github.com/hikirsch/htd-home-assistant/core/releases)
 
           # Check if the version exists in the published releases
           if echo "$RESPONSE" | grep -q "\"tag_name\": \"$VERSION\""; then
