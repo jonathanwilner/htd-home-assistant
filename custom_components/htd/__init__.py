@@ -17,17 +17,17 @@ PLATFORMS: list[Platform] = [Platform.MEDIA_PLAYER]
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup(hass: HomeAssistant, config: ConfigEntry):
+async def async_setup(_: HomeAssistant, __: ConfigEntry):
     return True
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
-    kind_raw = config_entry.data.get(CONF_DEVICE_KIND)
-    kind = HtdDeviceKind(kind_raw)
     host = config_entry.data.get(CONF_HOST)
     port = config_entry.data.get(CONF_PORT)
 
-    config_entry.runtime_data = get_client(kind, host, port)
+    network_address = (host, port)
+
+    config_entry.runtime_data = get_client(network_address=network_address)
 
     config_entry.async_on_unload(
         config_entry.add_update_listener(async_update_listener)

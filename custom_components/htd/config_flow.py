@@ -37,8 +37,8 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
         """Handle dhcp discovery."""
         _LOGGER.info("HTD device detected: %s %s" % (discovery_info.ip, self.port))
         host = discovery_info.ip
-
-        model_info = get_model_info(discovery_info.ip, self.port)
+        network_address = (host, self.port)
+        model_info = get_model_info(network_address=network_address)
 
         if model_info is None:
             return self.async_abort(reason="unknown_model")
@@ -84,7 +84,8 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
             unique_id = user_input[CONF_UNIQUE_ID] if CONF_UNIQUE_ID in user_input else "htd-%s-%s" % (host, port)
 
             try:
-                response = get_model_info(host, port)
+                network_address = host, port
+                response = get_model_info(network_address=network_address)
 
                 if response is not None:
                     success = True
@@ -130,7 +131,8 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
                 options={}
             )
 
-        model_info = get_model_info(self.host, self.port)
+        network_address = (self.host, self.port)
+        model_info = get_model_info(network_address=network_address)
 
         return self.async_show_form(
             step_id='options',
