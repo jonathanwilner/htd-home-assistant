@@ -3,14 +3,14 @@ from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components import dhcp
+from homeassistant.components import dhcp, usb
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow, OptionsFlowWithConfigEntry
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT, CONF_UNIQUE_ID
 from homeassistant.core import callback, HomeAssistant
 from htd_client import get_model_info, HtdDeviceKind
 from htd_client.constants import HtdConstants
 
-from .const import CONF_DEVICE_KIND, CONF_DEVICE_NAME, DOMAIN
+from .const import CONF_DEVICE_NAME, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,13 +45,12 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
 
         _LOGGER.info("Model identified as: %s" % model_info)
 
-        unique_id = "htd-%s-%s" % (discovery_info.macaddress, model_info["kind"])
+        unique_id = "htd-%s" % discovery_info.macaddress
 
         await self.async_set_unique_id(unique_id)
 
         self.unique_id = unique_id
         new_user_input = {
-            CONF_DEVICE_KIND: model_info["kind"],
             CONF_HOST: discovery_info.ip,
             CONF_PORT: self.port,
             CONF_UNIQUE_ID: unique_id,
@@ -78,7 +77,6 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             success = False
 
-            kind = user_input[CONF_DEVICE_KIND]
             host = user_input[CONF_HOST]
             port = int(user_input[CONF_PORT])
             unique_id = user_input[CONF_UNIQUE_ID] if CONF_UNIQUE_ID in user_input else "htd-%s-%s" % (host, port)
@@ -96,7 +94,6 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
                 pass
 
             if success:
-                self.kind = kind
                 self.host = host
                 self.port = port
                 self.unique_id = unique_id
@@ -119,7 +116,6 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_options(self, user_input=None):
         if user_input is not None:
             config_entry = {
-                CONF_DEVICE_KIND: self.kind,
                 CONF_HOST: self.host,
                 CONF_PORT: self.port,
                 CONF_UNIQUE_ID: self.unique_id,
@@ -162,6 +158,7 @@ class HtdOptionsFlowHandler(OptionsFlowWithConfigEntry):
             data_schema=get_connection_settings_schema(self.config_entry)
         )
 
+
 def get_options_schema(friendly_name: str):
     return vol.Schema(
         {
@@ -174,17 +171,14 @@ def get_options_schema(friendly_name: str):
 
 def get_connection_settings_schema(config_entry: ConfigEntry | None = None):
     if config_entry is not None:
-        kind = config_entry.data.get(CONF_DEVICE_KIND)
         host = config_entry.data.get(CONF_HOST)
         port = config_entry.data.get(CONF_PORT)
     else:
-        kind = None
         host = None
         port = HtdConstants.DEFAULT_PORT
 
     return vol.Schema(
         {
-            vol.Required(CONF_DEVICE_KIND, default=kind): vol.In([k.value for k in HtdDeviceKind]),
             vol.Required(CONF_HOST, default=host): cv.string,
             vol.Required(CONF_PORT, default=port): cv.port,
         }
