@@ -7,7 +7,7 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform, CONF_PORT, CONF_HOST
 from homeassistant.core import HomeAssistant
-from htd_client import get_client, HtdDeviceKind
+from htd_client import async_get_client
 
 from .const import DOMAIN, CONF_DEVICE_KIND
 from .utils import _async_cleanup_registry_entries
@@ -27,7 +27,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
 
     network_address = (host, port)
 
-    config_entry.runtime_data = get_client(network_address=network_address)
+    config_entry.runtime_data = await async_get_client(
+        network_address=network_address,
+        loop=hass.loop
+    )
 
     config_entry.async_on_unload(
         config_entry.add_update_listener(async_update_listener)

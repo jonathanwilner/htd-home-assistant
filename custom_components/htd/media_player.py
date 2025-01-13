@@ -164,12 +164,12 @@ class HtdDevice(MediaPlayerEntity):
         """Run when this Entity has been added to HA."""
         # Sensors should also register callbacks to HA when their state changes
         # print('registering callback')
-        self.client.subscribe(self._do_update)
+        await self.client.async_subscribe(self._do_update)
 
     async def async_will_remove_from_hass(self):
         """Entity being removed from hass."""
         # The opposite of async_added_to_hass. Remove any registered call backs here.
-        self.client.unsubscribe(self._do_update)
+        await self.client.async_unsubscribe(self._do_update)
 
     def _do_update(self, zone: int):
         if zone is None and self.zone_info is not None:

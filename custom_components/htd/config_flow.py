@@ -7,7 +7,7 @@ from homeassistant.components import dhcp
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow, OptionsFlowWithConfigEntry
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT, CONF_UNIQUE_ID
 from homeassistant.core import callback, HomeAssistant
-from htd_client import get_model_info
+from htd_client import async_get_model_info
 from htd_client.constants import HtdConstants
 
 from .const import CONF_DEVICE_NAME, DOMAIN
@@ -37,7 +37,7 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
         _LOGGER.info("HTD device detected: %s %s" % (discovery_info.ip, self.port))
         host = discovery_info.ip
         network_address = (host, self.port)
-        model_info = get_model_info(network_address=network_address)
+        model_info = await async_get_model_info(network_address=network_address)
 
         if model_info is None:
             return self.async_abort(reason="unknown_model")
@@ -82,7 +82,7 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
 
             try:
                 network_address = host, port
-                response = get_model_info(network_address=network_address)
+                response = await async_get_model_info(network_address=network_address)
 
                 if response is not None:
                     success = True
@@ -127,7 +127,7 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
             )
 
         network_address = (self.host, self.port)
-        model_info = get_model_info(network_address=network_address)
+        model_info = await async_get_model_info(network_address=network_address)
 
         return self.async_show_form(
             step_id='options',
