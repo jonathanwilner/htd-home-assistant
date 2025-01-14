@@ -114,31 +114,31 @@ class HtdDevice(MediaPlayerEntity):
     def volume_step(self) -> float:
         return 1 / HtdConstants.MAX_VOLUME
 
-    def turn_on(self):
-        self.client.power_on(self.zone)
+    async def async_turn_on(self):
+        await self.client.async_power_on(self.zone)
 
-    def turn_off(self):
-        self.client.power_off(self.zone)
+    async def async_turn_off(self):
+        await self.client.async_power_off(self.zone)
 
     @property
     def volume_level(self) -> float:
-        return  self.zone_info.volume / HtdConstants.MAX_VOLUME
+        return self.zone_info.volume / HtdConstants.MAX_VOLUME
 
     @property
     def available(self) -> bool:
         return self.client.ready and self.zone_info is not None
 
-    def set_volume_level(self, new_volume: float):
-        converted_volume = int(new_volume * HtdConstants.MAX_VOLUME)
-        _LOGGER.info("setting new volume for zone %d to %f, raw htd = %d" % (self.zone, new_volume, converted_volume))
-        self.client.set_volume(self.zone, converted_volume)
+    async def async_set_volume_level(self, volume: float):
+        converted_volume = int(volume * HtdConstants.MAX_VOLUME)
+        _LOGGER.info("setting new volume for zone %d to %f, raw htd = %d" % (self.zone, volume, converted_volume))
+        await self.client.async_set_volume(self.zone, converted_volume)
 
     @property
     def is_volume_muted(self) -> bool:
         return self.zone_info.mute
 
-    def mute_volume(self, mute):
-        self.client.toggle_mute(self.zone)
+    async def async_mute_volume(self, mute):
+        await self.client.async_toggle_mute(self.zone)
 
     @property
     def source(self) -> str:
@@ -152,9 +152,9 @@ class HtdDevice(MediaPlayerEntity):
     def media_title(self):
         return self.source
 
-    def select_source(self, source: int):
+    async def async_select_source(self, source: int):
         source_index = self.sources.index(source)
-        self.client.set_source(self.zone, source_index + 1)
+        await self.client.async_set_source(self.zone, source_index + 1)
 
     @property
     def icon(self):
