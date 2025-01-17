@@ -20,6 +20,7 @@ body:
       label: Home Assistant version
       description: Specify the version of Home Assistant you are using.
       placeholder: "e.g., 2024.12.1"
+    valdations:
       required: true
   - type: dropdown
     id: installation_method
@@ -29,6 +30,7 @@ body:
       options:
         - HACS
         - Other (please specify below)
+    valdations:
       required: true
   - type: textarea
     id: other_installation_method
@@ -45,6 +47,7 @@ body:
         - MC/MCA66
         - Lync 6
         - Lync 12
+    valdations:
       required: true
   - type: textarea
     id: bug_description
@@ -63,6 +66,7 @@ body:
         2. Click on '...'
         3. Scroll down to '...'
         4. See error
+    valdations:
       required: true
   - type: textarea
     id: additional_context
