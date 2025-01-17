@@ -31,7 +31,7 @@ If you wish to use a USB to Serial adapter, you will need to configure the integ
 
 ```yaml
 htd:
-  - name: Lync 6 over Serial
+  - device_name: Lync 6 over Serial
     path: /dev/ttyUSB0
 ```
 
