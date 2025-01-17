@@ -27,18 +27,17 @@ body:
     id: installation_method
     attributes:
       label: How was the integration installed?
-      description: Select how the integration was installed.
       options:
         - HACS
         - Other (please specify below)
+      default: 0
     validations:
       required: true
   - type: textarea
     id: other_installation_method
     attributes:
-      label: If "Other," specify the installation method
-      description: Provide details on how this integration was installed.
-      placeholder: "e.g., I copied everything from custom_components ..."
+      label: If "Other", please provide details on how this integration was installed.
+      placeholder: "e.g., I copied everything from this GitHub repository's custom_components folder and ..."
   - type: dropdown
     id: device_type
     attributes:
@@ -48,6 +47,7 @@ body:
         - MC/MCA66
         - Lync 6
         - Lync 12
+      default: 0
     validations:
       required: true
   - type: textarea
