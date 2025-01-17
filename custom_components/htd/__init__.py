@@ -1,6 +1,5 @@
 """Support for Home Theater Direct products"""
 
-import asyncio
 import logging
 
 import voluptuous as vol
@@ -51,9 +50,6 @@ async def async_setup(hass: HomeAssistant, config: dict):
             loop=hass.loop
         )
 
-        while not client.ready:
-            await asyncio.sleep(0)
-
         unique_id = f"{client.model['name']}-{serial_address}"
 
         devices.append({
@@ -76,10 +72,12 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
 
     network_address = (host, port)
 
-    config_entry.runtime_data = await async_get_client(
+    client = await async_get_client(
         network_address=network_address,
         loop=hass.loop
     )
+
+    config_entry.runtime_data = client
 
     config_entry.async_on_unload(
         config_entry.add_update_listener(async_update_listener)
