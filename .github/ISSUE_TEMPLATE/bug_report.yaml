@@ -1,0 +1,71 @@
+name: Bug Report
+description: Report a bug with the Home Assistant integration.
+title: "[Bug]: <Brief description of the issue>"
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report this bug! Please provide the following information to help us debug the issue effectively.
+  - type: input
+    id: integration_version
+    attributes:
+      label: Integration version
+      description: Specify the version of the integration you are using.
+      placeholder: "e.g., 2.0.0-beta.5"
+      required: true
+  - type: input
+    id: home_assistant_version
+    attributes:
+      label: Home Assistant version
+      description: Specify the version of Home Assistant you are using.
+      placeholder: "e.g., 2024.12.1"
+      required: true
+  - type: dropdown
+    id: installation_method
+    attributes:
+      label: How was the integration installed?
+      description: Select how the integration was installed.
+      options:
+        - HACS
+        - Other (please specify below)
+      required: true
+  - type: textarea
+    id: other_installation_method
+    attributes:
+      label: If "Other," specify the installation method
+      description: Provide details on how this integration was installed.
+      placeholder: "e.g., I copied everything from custom_components ..."
+  - type: dropdown
+    id: device_type
+    attributes:
+      label: Which HTD device is the issue happening on?
+      description: Select the affected device type.
+      options:
+        - MC/MCA66
+        - Lync 6
+        - Lync 12
+      required: true
+  - type: textarea
+    id: bug_description
+    attributes:
+      label: Describe the bug
+      description: Provide a clear and concise description of what the bug is.
+      placeholder: "What happened? What did you expect to happen?"
+      required: true
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Provide the steps to reproduce the issue.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+      required: true
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here (e.g., logs, screenshots).
