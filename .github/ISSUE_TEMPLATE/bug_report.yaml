@@ -30,7 +30,7 @@ body:
       options:
         - HACS
         - Other (please specify below)
-      default: 0
+      default: -1
     validations:
       required: true
   - type: textarea
@@ -47,7 +47,7 @@ body:
         - MC/MCA66
         - Lync 6
         - Lync 12
-      default: 0
+      default: -1
     validations:
       required: true
   - type: textarea
