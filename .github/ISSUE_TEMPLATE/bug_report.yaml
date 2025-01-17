@@ -12,7 +12,7 @@ body:
     attributes:
       label: Integration version
       description: Specify the version of the integration you are using.
-      placeholder: "e.g., 2.0.0-beta.5"
+      placeholder: "2.0.0-beta.5"
     validations:
       required: true
   - type: input
@@ -20,7 +20,7 @@ body:
     attributes:
       label: Home Assistant version
       description: Specify the version of Home Assistant you are using.
-      placeholder: "e.g., 2024.12.1"
+      placeholder: "2024.12.1"
     validations:
       required: true
   - type: dropdown
