@@ -1,23 +1,72 @@
 """Support for Home Theater Direct products"""
 
-from __future__ import annotations, annotations
-
+import asyncio
 import logging
 
+import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform, CONF_PORT, CONF_HOST
+from homeassistant.const import Platform, CONF_PORT, CONF_HOST, CONF_PATH, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv, discovery
 from htd_client import async_get_client
 
-from .const import DOMAIN, CONF_DEVICE_KIND
+from .const import DOMAIN, CONF_DEVICE_KIND, CONF_DEVICE_NAME
 from .utils import _async_cleanup_registry_entries
 
 PLATFORMS: list[Platform] = [Platform.MEDIA_PLAYER]
 
 _LOGGER = logging.getLogger(__name__)
 
+CONFIG_SCHEMA = vol.Schema(
+    {
+        DOMAIN: vol.Schema(
+            [
+                vol.Schema(
+                    {
+                        vol.Required(CONF_DEVICE_NAME): cv.string,
+                        vol.Required(CONF_PATH): cv.string,
+                    }
+                )
+            ]
+        )
+    },
+    extra=vol.ALLOW_EXTRA,
+)
 
-async def async_setup(_: HomeAssistant, __: ConfigEntry):
+
+async def async_setup(hass: HomeAssistant, config: dict):
+    htd_config = config.get(DOMAIN)
+
+    if htd_config is None:
+        return True
+
+    devices = []
+
+    for config in htd_config:
+        serial_address = config[CONF_PATH]
+        device_name = config[CONF_DEVICE_NAME]
+
+        client = await async_get_client(
+            serial_address=serial_address,
+            loop=hass.loop
+        )
+
+        while not client.ready:
+            await asyncio.sleep(0)
+
+        unique_id = f"{client.model['name']}-{serial_address}"
+
+        devices.append({
+            "client": client,
+            CONF_UNIQUE_ID: unique_id,
+            CONF_DEVICE_NAME: device_name
+        })
+
+    hass.data[DOMAIN] = devices
+
+    for component in PLATFORMS:
+        await discovery.async_load_platform(hass, component, DOMAIN, {}, config)
+
     return True
 
 

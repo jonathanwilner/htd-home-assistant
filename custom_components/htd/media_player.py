@@ -18,6 +18,8 @@ from homeassistant.core import HomeAssistant
 from htd_client import BaseClient, HtdConstants, HtdMcaClient
 from htd_client.models import ZoneDetail
 
+from .const import DOMAIN, CONF_DEVICE_NAME
+
 MEDIA_PLAYER_PREFIX = "media_player.htd_"
 
 SUPPORT_HTD = (
@@ -32,6 +34,36 @@ SUPPORT_HTD = (
 _LOGGER = logging.getLogger(__name__)
 
 type HtdClientConfigEntry = ConfigEntry[BaseClient]
+
+
+async def async_setup_platform(hass, _, async_add_entities, __=None):
+    htd_configs = hass.data[DOMAIN]
+    entities = []
+
+    for device_index in range(len(htd_configs)):
+        config = htd_configs[device_index]
+
+        unique_id = config[CONF_UNIQUE_ID]
+        device_name = config[CONF_DEVICE_NAME]
+        client = config["client"]
+
+        zone_count = client.get_zone_count()
+        source_count = client.get_source_count()
+        sources = [f"Source {i + 1}" for i in range(source_count)]
+        for zone in range(1, zone_count + 1):
+            entity = HtdDevice(
+                unique_id,
+                device_name,
+                zone,
+                sources,
+                client
+            )
+
+            entities.append(entity)
+
+    async_add_entities(entities)
+
+    return True
 
 
 async def async_setup_entry(_: HomeAssistant, config_entry: HtdClientConfigEntry, async_add_entities):
@@ -84,7 +116,7 @@ class HtdDevice(MediaPlayerEntity):
 
     @property
     def enabled(self) -> bool:
-        return self.zone_info is not None
+        return self.zone_info is not None and self.zone_info.enabled
 
     @property
     def supported_features(self):
@@ -175,7 +207,7 @@ class HtdDevice(MediaPlayerEntity):
         if zone is None and self.zone_info is not None:
             return
 
-        if zone is not None and zone != self.zone:
+        if zone is not None and zone != 0 and zone != self.zone:
             return
 
         if not self.client.has_zone_data(self.zone):
@@ -185,5 +217,6 @@ class HtdDevice(MediaPlayerEntity):
         if isinstance(self.client, HtdMcaClient) and self.client.has_volume_target(self.zone):
             return
 
-        self.zone_info = self.client.get_zone(self.zone)
-        self.schedule_update_ha_state()
+        if zone is not None and self.client.has_zone_data(zone):
+            self.zone_info = self.client.get_zone(zone)
+            self.schedule_update_ha_state(force_refresh=True)
