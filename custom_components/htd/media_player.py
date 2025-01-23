@@ -1,6 +1,7 @@
 """Support for HTD"""
 
 import logging
+import re
 
 from homeassistant.components.media_player import MediaPlayerEntity
 from homeassistant.components.media_player.const import (
@@ -20,7 +21,12 @@ from htd_client.models import ZoneDetail
 
 from .const import DOMAIN, CONF_DEVICE_NAME
 
-MEDIA_PLAYER_PREFIX = "media_player.htd_"
+
+def make_alphanumeric(input_string):
+    temp = re.sub(r'[^a-zA-Z0-9]', '_', input_string)
+    return re.sub(r'_+', '_', temp).strip('_')
+
+get_media_player_entity_id = lambda name, zone_number, zone_fmt: f"media_player.{make_alphanumeric(name)}_zone_{zone_number:{zone_fmt}}".lower()
 
 SUPPORT_HTD = (
     MediaPlayerEntityFeature.SELECT_SOURCE |
@@ -108,11 +114,13 @@ class HtdDevice(MediaPlayerEntity):
         sources,
         client
     ):
-        self.unique_id = f"{unique_id}_{zone}"
+        self.unique_id = f"{unique_id}_{zone:02}"
         self.device_name = device_name
         self.zone = zone
         self.client = client
         self.sources = sources
+        zone_fmt = f"02" if self.client.model["zones"] > 10 else "01"
+        self.entity_id = get_media_player_entity_id(device_name, zone, zone_fmt)
 
     @property
     def enabled(self) -> bool:
