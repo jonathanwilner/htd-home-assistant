@@ -15,10 +15,10 @@
   "config_flow": true,
   "dhcp": [
     {
-      "macaddress": "A44F29"
+      "macaddress": "A44F29*"
     },
     {
-      "macaddress": "A64F29"
+      "macaddress": "A64F29*"
     }
   ]
 }
