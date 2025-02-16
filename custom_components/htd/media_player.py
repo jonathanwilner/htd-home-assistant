@@ -154,6 +154,12 @@ class HtdDevice(MediaPlayerEntity):
     def volume_step(self) -> float:
         return 1 / HtdConstants.MAX_VOLUME
 
+    async def async_volume_up(self) -> None:
+        await self.client.async_volume_up(self.zone)
+
+    async def async_volume_down(self) -> None:
+        await self.client.async_volume_down(self.zone)
+
     async def async_turn_on(self):
         await self.client.async_power_on(self.zone)
 
