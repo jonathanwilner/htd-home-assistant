@@ -4,3 +4,4 @@ venv/
 venv2/
 .idea
 hass-working-directory
+/node_modules/
