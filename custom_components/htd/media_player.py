@@ -184,7 +184,10 @@ class HtdDevice(MediaPlayerEntity):
         return self.zone_info.mute
 
     async def async_mute_volume(self, mute):
-        await self.client.async_toggle_mute(self.zone)
+        if mute:
+            await self.client.async_mute(self.zone)
+        else:
+            await self.client.async_unmute(self.zone)
 
     @property
     def source(self) -> str:
