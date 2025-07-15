@@ -5,7 +5,8 @@ import re
 
 from homeassistant.components.media_player import MediaPlayerEntity
 from homeassistant.components.media_player.const import (
-    MediaPlayerEntityFeature
+    MediaPlayerEntityFeature,
+    MediaPlayerDeviceClass,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -208,6 +209,10 @@ class HtdDevice(MediaPlayerEntity):
     @property
     def icon(self):
         return "mdi:disc-player"
+
+    @property
+    def device_class(self) -> MediaPlayerDeviceClass:
+        return MediaPlayerDeviceClass.SPEAKER
 
     async def async_added_to_hass(self):
         """Run when this Entity has been added to HA."""
