@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv, discovery
 from htd_client import async_get_client
 
-from .const import DOMAIN, CONF_DEVICE_KIND, CONF_DEVICE_NAME
+from .const import DOMAIN, CONF_DEVICE_NAME
 from .utils import _async_cleanup_registry_entries
 
 PLATFORMS: list[Platform] = [Platform.MEDIA_PLAYER]
