@@ -100,7 +100,6 @@ class HtdDevice(MediaPlayerEntity):
     _attr_supported_features = SUPPORT_HTD
     _attr_device_class = MediaPlayerDeviceClass.RECEIVER
 
-    unique_id: str = None
 
     device_name: str = None
     client: BaseClient = None
