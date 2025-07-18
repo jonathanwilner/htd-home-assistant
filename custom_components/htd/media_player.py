@@ -37,7 +37,7 @@ SUPPORT_HTD = (
 
 _LOGGER = logging.getLogger(__name__)
 
-type HtdClientConfigEntry = ConfigEntry[BaseClient]
+HtdClientConfigEntry = ConfigEntry[BaseClient]
 
 
 async def async_setup_platform(hass, _, async_add_entities, __=None):
@@ -99,6 +99,7 @@ class HtdDevice(MediaPlayerEntity):
 
     _attr_supported_features = SUPPORT_HTD
     _attr_device_class = MediaPlayerDeviceClass.RECEIVER
+    _attr_media_content_type = MediaType.MUSIC
 
 
     device_name: str = None
@@ -205,13 +206,12 @@ class HtdDevice(MediaPlayerEntity):
         await self.client.async_set_source(self.zone, source_index + 1)
 
 
-    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
-  
     @property
     def icon(self):
         return "mdi:disc-player"
 
-
+    @property
+    def device_class(self) -> MediaPlayerDeviceClass:
         return MediaPlayerDeviceClass.RECEIVER
 
     async def async_added_to_hass(self):
