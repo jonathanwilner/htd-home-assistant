@@ -96,7 +96,7 @@ async def async_setup_entry(_: HomeAssistant, config_entry: HtdClientConfigEntry
 class HtdDevice(MediaPlayerEntity):
     should_poll = False
 
-    unique_id: str = None
+    _attr_unique_id: str | None = None
     device_name: str = None
     client: BaseClient = None
     sources: [str] = None
@@ -112,7 +112,7 @@ class HtdDevice(MediaPlayerEntity):
         sources,
         client
     ):
-        self.unique_id = f"{unique_id}_{zone:02}"
+        self._attr_unique_id = f"{unique_id}_{zone:02}"
         self.device_name = device_name
         self.zone = zone
         self.client = client
