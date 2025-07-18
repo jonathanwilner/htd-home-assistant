@@ -2,7 +2,8 @@
 - new HTD domain,
 - support ConfigFlow
 - support AutoDiscovery
-- fix HomeKit device class so zones show as speakers
+- fix HomeKit device class so zones show as receivers
+
 
 ### 1.2.0 - July  11, 2024
 - Upgrading to HASS 2024.6.4
