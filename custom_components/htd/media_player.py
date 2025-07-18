@@ -3,10 +3,8 @@
 import logging
 import re
 
-from homeassistant.components.media_player import MediaPlayerEntity
-from homeassistant.components.media_player.const import (
-    MediaPlayerEntityFeature
-)
+from homeassistant.components.media_player import MediaPlayerEntity, MediaPlayerDeviceClass
+from homeassistant.components.media_player.const import MediaPlayerEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_UNIQUE_ID,
@@ -204,6 +202,8 @@ class HtdDevice(MediaPlayerEntity):
     async def async_select_source(self, source: int):
         source_index = self.sources.index(source)
         await self.client.async_set_source(self.zone, source_index + 1)
+
+    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
 
     @property
     def icon(self):
