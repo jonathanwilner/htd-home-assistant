@@ -4,7 +4,7 @@ import logging
 import re
 
 from homeassistant.components.media_player import MediaPlayerEntity, MediaPlayerDeviceClass
-from homeassistant.components.media_player.const import MediaPlayerEntityFeature
+from homeassistant.components.media_player.const import MediaPlayerEntityFeature, MediaType
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_UNIQUE_ID,
@@ -204,6 +204,7 @@ class HtdDevice(MediaPlayerEntity):
         await self.client.async_set_source(self.zone, source_index + 1)
 
     _attr_device_class = MediaPlayerDeviceClass.RECEIVER
+    _attr_media_content_type = MediaType.MUSIC
 
     @property
     def icon(self):
@@ -211,7 +212,7 @@ class HtdDevice(MediaPlayerEntity):
 
     @property
     def device_class(self) -> MediaPlayerDeviceClass:
-        return MediaPlayerDeviceClass.SPEAKER
+        return MediaPlayerDeviceClass.RECEIVER
 
     async def async_added_to_hass(self):
         """Run when this Entity has been added to HA."""

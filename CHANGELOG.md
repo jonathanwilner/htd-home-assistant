@@ -3,6 +3,7 @@
 - support ConfigFlow
 - support AutoDiscovery
 - fix HomeKit device class so zones show as receivers
+- expose media content type so HomeKit recognizes zones as music players
 
 
 ### 1.2.0 - July  11, 2024
