@@ -93,8 +93,12 @@ async def async_setup_entry(_: HomeAssistant, config_entry: HtdClientConfigEntry
     async_add_entities(entities)
 
 
+
 class HtdDevice(MediaPlayerEntity):
     should_poll = False
+
+    _attr_supported_features = SUPPORT_HTD
+    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
 
     unique_id: str = None
     device_name: str = None
@@ -112,7 +116,7 @@ class HtdDevice(MediaPlayerEntity):
         sources,
         client
     ):
-        self.unique_id = f"{unique_id}_{zone:02}"
+        self._attr_unique_id = f"{unique_id}_{zone:02}"
         self.device_name = device_name
         self.zone = zone
         self.client = client
@@ -124,9 +128,6 @@ class HtdDevice(MediaPlayerEntity):
     def enabled(self) -> bool:
         return self.zone_info is not None and self.zone_info.enabled
 
-    @property
-    def supported_features(self):
-        return SUPPORT_HTD
 
     @property
     def name(self):
@@ -203,15 +204,9 @@ class HtdDevice(MediaPlayerEntity):
         source_index = self.sources.index(source)
         await self.client.async_set_source(self.zone, source_index + 1)
 
-    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
-
     @property
     def icon(self):
         return "mdi:disc-player"
-
-    @property
-    def device_class(self) -> MediaPlayerDeviceClass:
-        return MediaPlayerDeviceClass.SPEAKER
 
     async def async_added_to_hass(self):
         """Run when this Entity has been added to HA."""

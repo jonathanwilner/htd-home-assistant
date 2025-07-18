@@ -58,7 +58,7 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured()
 
         self.context["title_placeholders"] = {
-            CONF_NAME: f"{model_info["friendly_name"]} ({host})",
+            CONF_NAME: f"{model_info['friendly_name']} ({host})",
         }
 
         return await self.async_step_custom_connection(new_user_input)
@@ -96,6 +96,9 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
                 self.host = host
                 self.port = port
                 self.unique_id = unique_id
+
+                await self.async_set_unique_id(unique_id)
+                self._abort_if_unique_id_configured()
 
                 return await self.async_step_options()
 
