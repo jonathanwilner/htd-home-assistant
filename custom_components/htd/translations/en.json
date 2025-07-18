@@ -4,9 +4,6 @@
       "user": {
         "title": "Home Theater Direct",
         "data": {
-          "device_kind": "Type of device",
-          "mca": "MC/MCA66",
-          "lync": "Lync 6/12",
           "host": "Host name or IP Address",
           "port": "Port (default is 10006)"
         }
@@ -29,7 +26,6 @@
       "init": {
         "title": "Configure Device",
         "data": {
-          "device_kind": "Type of device",
           "host": "Host name or IP Address",
           "port": "Port (default is 10006)"
         }
