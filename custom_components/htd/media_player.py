@@ -37,7 +37,7 @@ SUPPORT_HTD = (
 
 _LOGGER = logging.getLogger(__name__)
 
-type HtdClientConfigEntry = ConfigEntry[BaseClient]
+HtdClientConfigEntry = ConfigEntry[BaseClient]
 
 
 async def async_setup_platform(hass, _, async_add_entities, __=None):
@@ -99,6 +99,7 @@ class HtdDevice(MediaPlayerEntity):
 
     _attr_supported_features = SUPPORT_HTD
     _attr_device_class = MediaPlayerDeviceClass.RECEIVER
+    _attr_media_content_type = MediaType.MUSIC
 
 
     device_name: str = None
@@ -166,7 +167,9 @@ class HtdDevice(MediaPlayerEntity):
         await self.client.async_power_off(self.zone)
 
     @property
-    def volume_level(self) -> float:
+    def volume_level(self) -> float | None:
+        if self.zone_info is None:
+            return None
         return self.zone_info.volume / HtdConstants.MAX_VOLUME
 
     @property
@@ -179,7 +182,9 @@ class HtdDevice(MediaPlayerEntity):
         await self.client.async_set_volume(self.zone, converted_volume)
 
     @property
-    def is_volume_muted(self) -> bool:
+    def is_volume_muted(self) -> bool | None:
+        if self.zone_info is None:
+            return None
         return self.zone_info.mute
 
     async def async_mute_volume(self, mute):
@@ -189,7 +194,9 @@ class HtdDevice(MediaPlayerEntity):
             await self.client.async_unmute(self.zone)
 
     @property
-    def source(self) -> str:
+    def source(self) -> str | None:
+        if self.zone_info is None:
+            return None
         return self.sources[self.zone_info.source - 1]
 
     @property
@@ -200,18 +207,17 @@ class HtdDevice(MediaPlayerEntity):
     def media_title(self):
         return self.source
 
-    async def async_select_source(self, source: int):
+    async def async_select_source(self, source: str):
         source_index = self.sources.index(source)
         await self.client.async_set_source(self.zone, source_index + 1)
 
 
-    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
-  
     @property
     def icon(self):
         return "mdi:disc-player"
 
-
+    @property
+    def device_class(self) -> MediaPlayerDeviceClass:
         return MediaPlayerDeviceClass.RECEIVER
 
     async def async_added_to_hass(self):
