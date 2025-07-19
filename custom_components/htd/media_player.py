@@ -108,6 +108,9 @@ class HtdDevice(MediaPlayerEntity):
     zone: int = None
     changing_volume: int | None = None
     zone_info: ZoneDetail = None
+    _attr_volume_level: float | None = None
+    _attr_is_volume_muted: bool | None = None
+    _attr_source: str | None = None
 
     def __init__(
         self,
@@ -136,6 +139,7 @@ class HtdDevice(MediaPlayerEntity):
 
     def update(self):
         self.zone_info = self.client.get_zone(self.zone)
+        self._update_properties()
 
     @property
     def state(self):
@@ -168,9 +172,7 @@ class HtdDevice(MediaPlayerEntity):
 
     @property
     def volume_level(self) -> float | None:
-        if self.zone_info is None:
-            return None
-        return self.zone_info.volume / HtdConstants.MAX_VOLUME
+        return self._attr_volume_level
 
     @property
     def available(self) -> bool:
@@ -183,9 +185,7 @@ class HtdDevice(MediaPlayerEntity):
 
     @property
     def is_volume_muted(self) -> bool | None:
-        if self.zone_info is None:
-            return None
-        return self.zone_info.mute
+        return self._attr_is_volume_muted
 
     async def async_mute_volume(self, mute):
         if mute:
@@ -195,9 +195,7 @@ class HtdDevice(MediaPlayerEntity):
 
     @property
     def source(self) -> str | None:
-        if self.zone_info is None:
-            return None
-        return self.sources[self.zone_info.source - 1]
+        return self._attr_source
 
     @property
     def source_list(self):
@@ -232,6 +230,23 @@ class HtdDevice(MediaPlayerEntity):
         # The opposite of async_added_to_hass. Remove any registered call backs here.
         await self.client.async_unsubscribe(self._do_update)
 
+    def _update_properties(self) -> None:
+        """Update entity attributes from the latest zone information."""
+        if self.zone_info is None:
+            self._attr_volume_level = None
+            self._attr_is_volume_muted = None
+            self._attr_source = None
+            return
+
+        self._attr_volume_level = (
+            self.zone_info.volume / HtdConstants.MAX_VOLUME
+        )
+        self._attr_is_volume_muted = self.zone_info.mute
+        try:
+            self._attr_source = self.sources[self.zone_info.source - 1]
+        except (IndexError, TypeError):
+            self._attr_source = None
+
     def _do_update(self, zone: int):
         if zone is None and self.zone_info is not None:
             return
@@ -248,4 +263,5 @@ class HtdDevice(MediaPlayerEntity):
 
         if zone is not None and self.client.has_zone_data(zone):
             self.zone_info = self.client.get_zone(zone)
+            self._update_properties()
             self.schedule_update_ha_state(force_refresh=True)
