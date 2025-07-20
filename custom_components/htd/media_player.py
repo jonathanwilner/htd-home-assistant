@@ -32,7 +32,10 @@ SUPPORT_HTD = (
     MediaPlayerEntityFeature.TURN_ON |
     MediaPlayerEntityFeature.VOLUME_MUTE |
     MediaPlayerEntityFeature.VOLUME_SET |
-    MediaPlayerEntityFeature.VOLUME_STEP
+    MediaPlayerEntityFeature.VOLUME_STEP |
+    MediaPlayerEntityFeature.PLAY |
+    MediaPlayerEntityFeature.PAUSE |
+    MediaPlayerEntityFeature.STOP
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -98,7 +101,7 @@ class HtdDevice(MediaPlayerEntity):
     should_poll = False
 
     _attr_supported_features = SUPPORT_HTD
-    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
+    _attr_device_class = MediaPlayerDeviceClass.SPEAKER
     _attr_media_content_type = MediaType.MUSIC
 
 
@@ -208,6 +211,15 @@ class HtdDevice(MediaPlayerEntity):
     async def async_select_source(self, source: str):
         source_index = self.sources.index(source)
         await self.client.async_set_source(self.zone, source_index + 1)
+
+    async def async_media_play(self):
+        await self.async_turn_on()
+
+    async def async_media_pause(self):
+        await self.async_turn_off()
+
+    async def async_media_stop(self):
+        await self.async_turn_off()
 
 
     @property
