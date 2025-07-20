@@ -100,6 +100,10 @@ class HtdDevice(MediaPlayerEntity):
     _attr_supported_features = SUPPORT_HTD
     _attr_device_class = MediaPlayerDeviceClass.RECEIVER
     _attr_media_content_type = MediaType.MUSIC
+    _attr_volume_level = None
+    _attr_is_volume_muted = None
+    _attr_source = None
+
 
 
     device_name: str = None
@@ -124,6 +128,22 @@ class HtdDevice(MediaPlayerEntity):
         self.sources = sources
         zone_fmt = f"02" if self.client.model["zones"] > 10 else "01"
         self.entity_id = get_media_player_entity_id(device_name, zone, zone_fmt)
+
+    def _update_properties(self) -> None:
+        """Update cached attributes from the latest zone info."""
+        if self.zone_info is None:
+            self._attr_available = False
+            self._attr_state = STATE_UNKNOWN
+            self._attr_volume_level = None
+            self._attr_is_volume_muted = None
+            self._attr_source = None
+            return
+
+        self._attr_available = self.client.ready
+        self._attr_state = STATE_ON if self.zone_info.power else STATE_OFF
+        self._attr_volume_level = self.zone_info.volume / HtdConstants.MAX_VOLUME
+        self._attr_is_volume_muted = self.zone_info.mute
+        self._attr_source = self.sources[self.zone_info.source - 1]
 
     @property
     def enabled(self) -> bool:
@@ -226,6 +246,8 @@ class HtdDevice(MediaPlayerEntity):
         # print('registering callback')
         await self.client.async_subscribe(self._do_update)
         self.client.refresh()
+        self.zone_info = self.client.get_zone(self.zone)
+        self._update_properties()
 
     async def async_will_remove_from_hass(self):
         """Entity being removed from hass."""
@@ -248,4 +270,5 @@ class HtdDevice(MediaPlayerEntity):
 
         if zone is not None and self.client.has_zone_data(zone):
             self.zone_info = self.client.get_zone(zone)
+            self._update_properties()
             self.schedule_update_ha_state(force_refresh=True)
