@@ -251,7 +251,11 @@ class HtdDevice(MediaPlayerEntity):
             self._attr_source = None
             return
 
-        self._attr_volume_level = self.zone_info.volume / HtdConstants.MAX_VOLUME
+        if self.zone_info.volume is not None:
+            self._attr_volume_level = self.zone_info.volume / HtdConstants.MAX_VOLUME
+        else:
+            self._attr_volume_level = None
+
         self._attr_is_volume_muted = self.zone_info.mute
         try:
             self._attr_source = self.sources[self.zone_info.source - 1]
