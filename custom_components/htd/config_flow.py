@@ -4,7 +4,14 @@ from typing import Any
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components import dhcp
-from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow, OptionsFlowWithConfigEntry
+from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlow,
+    OptionsFlowWithConfigEntry,
+)
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT, CONF_UNIQUE_ID
 from homeassistant.core import callback, HomeAssistant
 from htd_client import async_get_model_info
@@ -29,6 +36,38 @@ class HtdConfigFlow(ConfigFlow, domain=DOMAIN):
     host: str = None
     port: int = HtdConstants.DEFAULT_PORT
     unique_id: str = None
+
+    async def async_step_zeroconf(
+        self, discovery_info: ZeroconfServiceInfo
+    ) -> ConfigFlowResult:
+        """Handle Zeroconf discovery."""
+        _LOGGER.info("HTD device zeroconf discovery: %s", discovery_info.host)
+
+        host = discovery_info.host
+        network_address = (host, self.port)
+        model_info = await async_get_model_info(network_address=network_address)
+
+        if model_info is None:
+            return self.async_abort(reason="cannot_connect")
+
+        unique_id = f"htd-{discovery_info.properties.get('macaddress', host)}"
+
+        await self.async_set_unique_id(unique_id)
+
+        self.unique_id = unique_id
+        new_user_input = {
+            CONF_HOST: host,
+            CONF_PORT: self.port,
+            CONF_UNIQUE_ID: unique_id,
+        }
+
+        self._abort_if_unique_id_configured()
+
+        self.context["title_placeholders"] = {
+            CONF_NAME: f"{model_info['friendly_name']} ({host})",
+        }
+
+        return await self.async_step_custom_connection(new_user_input)
 
     async def async_step_dhcp(
         self, discovery_info: dhcp.DhcpServiceInfo
