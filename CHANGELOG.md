@@ -2,7 +2,8 @@
 - new HTD domain,
 - support ConfigFlow
 - support AutoDiscovery
-- fix HomeKit device class so zones show as receivers
+- fix HomeKit device class so zones show as speakers
+- ensure volume controls continue working when zones appear as speakers
 - expose media content type so HomeKit recognizes zones as music players
 
 

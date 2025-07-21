@@ -100,7 +100,7 @@ class HtdDevice(MediaPlayerEntity):
     should_poll = False
 
     _attr_supported_features = SUPPORT_HTD
-    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
+    _attr_device_class = MediaPlayerDeviceClass.SPEAKER
     _attr_media_content_type = MediaType.MUSIC
 
     device_name: str = None
@@ -159,10 +159,20 @@ class HtdDevice(MediaPlayerEntity):
     async def async_volume_up(self) -> None:
         """Turn volume up for the zone."""
         await self.client.async_volume_up(self.zone)
+        if self._attr_volume_level is not None:
+            self._attr_volume_level = min(
+                1.0, self._attr_volume_level + self.volume_step
+            )
+            self.schedule_update_ha_state()
 
     async def async_volume_down(self) -> None:
         """Turn volume down for the zone."""
         await self.client.async_volume_down(self.zone)
+        if self._attr_volume_level is not None:
+            self._attr_volume_level = max(
+                0.0, self._attr_volume_level - self.volume_step
+            )
+            self.schedule_update_ha_state()
 
     async def async_media_play(self) -> None:
         """Send play command."""
@@ -196,6 +206,8 @@ class HtdDevice(MediaPlayerEntity):
             converted_volume,
         )
         await self.client.async_set_volume(self.zone, converted_volume)
+        self._attr_volume_level = volume
+        self.schedule_update_ha_state()
 
     @property
     def is_volume_muted(self) -> bool | None:
@@ -206,8 +218,11 @@ class HtdDevice(MediaPlayerEntity):
         """Mute or unmute the device."""
         if mute:
             await self.client.async_mute(self.zone)
+            self._attr_is_volume_muted = True
         else:
             await self.client.async_unmute(self.zone)
+            self._attr_is_volume_muted = False
+        self.schedule_update_ha_state()
 
     @property
     def source(self) -> str | None:
