@@ -29,7 +29,7 @@ get_media_player_entity_id = lambda name, zone_number, zone_fmt: f"media_player.
 SUPPORT_HTD = (
     MediaPlayerEntityFeature.SELECT_SOURCE |
     MediaPlayerEntityFeature.TURN_OFF |
-    MediaPlayerEntityFeature.TURN_ON |
+    MediaPlayerEntityEntityFeature.TURN_ON |
     MediaPlayerEntityFeature.VOLUME_MUTE |
     MediaPlayerEntityFeature.VOLUME_SET |
     MediaPlayerEntityFeature.VOLUME_STEP |
@@ -141,8 +141,9 @@ class HtdDevice(MediaPlayerEntity):
         return f"Zone {self.zone} ({self.device_name})"
 
     def update(self):
-        self.zone_info = self.client.get_zone(self.zone)
-        self._update_properties()
+        # This method is not used as should_poll is False.
+        # State updates are handled via _do_update callback.
+        pass
 
     @property
     def state(self):
@@ -168,14 +169,28 @@ class HtdDevice(MediaPlayerEntity):
         await self.client.async_volume_down(self.zone)
 
     async def async_turn_on(self):
-        await self.client.async_power_on(self.zone)
+        _LOGGER.debug("Attempting to turn on zone %d for device %s", self.zone, self.device_name)
+        try:
+            await self.client.async_power_on(self.zone)
+            _LOGGER.debug("Successfully called async_power_on for zone %d", self.zone)
+        except Exception as e:
+            _LOGGER.error("Error turning on zone %d: %s", self.zone, e)
+            _LOGGER.exception(e)
+
 
     async def async_turn_off(self):
-        await self.client.async_power_off(self.zone)
+        _LOGGER.debug("Attempting to turn off zone %d for device %s", self.zone, self.device_name)
+        try:
+            await self.client.async_power_off(self.zone)
+            _LOGGER.debug("Successfully called async_power_off for zone %d", self.zone)
+        except Exception as e:
+            _LOGGER.error("Error turning off zone %d: %s", self.zone, e)
+            _LOGGER.exception(e)
 
     @property
     def volume_level(self) -> float | None:
         return self._attr_volume_level
+
 
     @property
     def available(self) -> bool:
@@ -191,10 +206,17 @@ class HtdDevice(MediaPlayerEntity):
         return self._attr_is_volume_muted
 
     async def async_mute_volume(self, mute):
-        if mute:
-            await self.client.async_mute(self.zone)
-        else:
-            await self.client.async_unmute(self.zone)
+        _LOGGER.debug("Attempting to set mute state to %s for zone %d", mute, self.zone)
+        try:
+            if mute:
+                await self.client.async_mute(self.zone)
+            else:
+                await self.client.async_unmute(self.zone)
+            _LOGGER.debug("Successfully set mute state to %s for zone %d", mute, self.zone)
+        except Exception as e:
+            _LOGGER.error("Error setting mute state for zone %d: %s", self.zone, e)
+            _LOGGER.exception(e)
+
 
     @property
     def source(self) -> str | None:
@@ -260,20 +282,21 @@ class HtdDevice(MediaPlayerEntity):
             self._attr_source = None
 
     def _do_update(self, zone: int):
-        if zone is None and self.zone_info is not None:
-            return
-
+        # If a specific zone is provided and it's not this entity's zone, ignore.
+        # Zone 0 typically indicates a global update, which we should process.
         if zone is not None and zone != 0 and zone != self.zone:
             return
 
+        # If the client does not have data for this specific zone yet, do not proceed.
         if not self.client.has_zone_data(self.zone):
             return
 
-        # if there's a target volume for mca, don't update yet
+        # If it's an MCA client and a volume target is set, defer the update for volume-related properties.
         if isinstance(self.client, HtdMcaClient) and self.client.has_volume_target(self.zone):
             return
 
-        if zone is not None and self.client.has_zone_data(zone):
-            self.zone_info = self.client.get_zone(zone)
-            self._update_properties()
-            self.schedule_update_ha_state(force_refresh=True)
+        # Update this entity's zone information regardless of the update source (specific zone or global).
+        self.zone_info = self.client.get_zone(self.zone)
+        self._update_properties()
+        self.schedule_update_ha_state(force_refresh=True)
+
